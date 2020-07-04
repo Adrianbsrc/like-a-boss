@@ -10,5 +10,8 @@
   "license": "MIT",
   "dependencies": {
     "live-server": "^1.2.1"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2"
   }
 }
