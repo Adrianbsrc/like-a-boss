@@ -1,26 +1,14 @@
 *{
   margin: 0;
-  padding: 0;
-  outline: 0;
+  border: 0;
 }
-button{
-  cursor: pointer;
-}
-p{
-  margin: 0;
-}
-span{
-  font-size: 15px;
-}
+
 section{
-  border: solid 1px purple;
-}
-section{
-  border: solid 1px purple;
+  border: solid 1px blue;
   p{
-    color: blue;
+    color: red;
   }
   span{
-    margin: 5px;
+    background-color: blue;
   }
 }
