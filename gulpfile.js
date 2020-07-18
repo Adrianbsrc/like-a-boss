@@ -1,56 +1,45 @@
 var gulp = require('gulp');
 var rename = require('gulp-rename');
-var sass = require('gulp-sass');
-var uglifycss = require('gulp-uglifycss');
+var sass = require('gulp-sass'); 
 var plumber  = require('gulp-plumber');
-var uglify   = require('gulp-uglify');
+var uglify   = require('gulp-terser');
+const babel = require('gulp-babel');
 var concat   = require('gulp-concat');
-var rename   = require('gulp-rename');
 
+//Develop Path
+var mainScssFile = 'src/scss/main-styles.scss';
+var scssFiles = 'src/scss/**/*.scss';
+var jsFiles = 'src/js/**/*.js';
 
-/* Production Folders (public) */
-var cssFolder = './public/css/';
-var jsFolder = './public/js/';
+//Production Path
+var cssFolderProduction = 'public/css/';
+var jsFolderProduction = 'public/js/';
+var jsFolderProductionName = 'scripts.js';
 
-/* Development Folders (src) */
-var scssFiles = './src/scss/**/*.scss';
-var jsFiles = './src/js/**/*.js';
+var sassProdOptions = {
+    outputStyle: 'compressed'
+}
 
-gulp.task('style', function(){
-  gulp.src(scssFiles)
-    .pipe(sass({
-      errLogToConsole: true,
-      outputStyle: 'compressed'
-    })).on('error', console.error.bind(console))
-    .pipe(rename({suffix:'.min'}))
-    .pipe(gulp.dest(cssFolder))
+gulp.task('sassprod', async function(){
+    return gulp.src(mainScssFile)
+        .pipe(sass(sassProdOptions).on('error', sass.logError))
+        .pipe(rename('style-main.min.css'))
+        .pipe(gulp.dest(cssFolderProduction))
 });
 
-/*
-gulp.task('css', function(){
-  gulp.src('./public/css/*.css')
-  .pipe(uglifycss({
-    "uglyComments": true
-  }))
-  .pipe(gulp.dest(cssFolder))
+gulp.task('scripts', function(){
+    return gulp.src(jsFiles)
+            .pipe(concat(jsFolderProductionName))
+            .pipe(rename({suffix: '.min'}))
+            .pipe(uglify())
+            .pipe(gulp.dest(jsFolderProduction))
 
-  gulp.series('watch');
-})
-*/
-
-gulp.task('scripts', function() {
-	return gulp.src(jsFiles)
-        .pipe(plumber())
-	      .pipe(uglify())
-        .pipe(concat('scripts.js'))
-        .pipe(rename({suffix: '.min'}))
-        .pipe(gulp.dest(jsFolder));
 });
 
-
-gulp.task('watch', function(){
-  gulp.watch([scssFiles], gulp.series('style'))
-  gulp.watch([jsFiles], gulp.series('scripts'))
+gulp.task('watch', function (done) {
+    gulp.watch(scssFiles, gulp.series('sassprod'));
+    gulp.watch(jsFiles, gulp.series('scripts'));
+    done();
 });
 
-gulp.task('default', gulp.parallel('style','scripts','watch'))
+gulp.task('default', gulp.series('sassprod','scripts','watch'));
